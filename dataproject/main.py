@@ -88,3 +88,11 @@ print("\n--- 4. CORRELATION CHECK ---")
 # Check how strongly distance and prep time correlate with total delivery time
 correlations = df[['Distance_KM', 'Prep_Time_Minutes', 'Delivery_Time']].corr()
 print(correlations['Delivery_Time'])
+# Check if motorcycles are slower because they travel further
+print("\n--- VEHICLE EFFICIENCY BY DISTANCE & TRAFFIC ---")
+vehicle_deep_dive = df.groupby('Vehicle').agg(
+    Avg_Delivery_Time=('Delivery_Time', 'mean'),
+    Avg_Distance=('Distance_KM', 'mean'),
+    Total_Trips=('Delivery_Time', 'count'),
+)
+print(vehicle_deep_dive)
