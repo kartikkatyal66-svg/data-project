@@ -61,3 +61,30 @@ df = df[(df['Distance_KM'] >= 0.1) & (df['Distance_KM'] <= 30)]
 print("Cleaned Dataset Shape:", df.shape)
 print("\nAccurate Delivery Distance Summary (KM):")
 print(df['Distance_KM'].describe())
+# --- 8. ROOT CAUSE & BOTTLENECK ANALYSIS ---
+
+print("\n--- 1. IMPACT OF TRAFFIC DENSITY ---")
+# Compare average and median delivery time by traffic condition
+traffic_perf = df.groupby('Traffic')[['Delivery_Time', 'Distance_KM']].agg(
+    ['mean', 'count']
+)
+print(traffic_perf)
+
+print("\n--- 2. IMPACT OF WEATHER ---")
+# Compare average delivery time across weather patterns
+weather_perf = df.groupby('Weather')['Delivery_Time'].agg(
+    ['mean', 'count']
+).sort_values(by='mean', ascending=False)
+print(weather_perf)
+
+print("\n--- 3. FLEET PERFORMANCE (VEHICLE TYPE) ---")
+# Compare vehicle efficiency across delivery times
+vehicle_perf = df.groupby('Vehicle')['Delivery_Time'].agg(
+    ['mean', 'count']
+).sort_values(by='mean', ascending=False)
+print(vehicle_perf)
+
+print("\n--- 4. CORRELATION CHECK ---")
+# Check how strongly distance and prep time correlate with total delivery time
+correlations = df[['Distance_KM', 'Prep_Time_Minutes', 'Delivery_Time']].corr()
+print(correlations['Delivery_Time'])
