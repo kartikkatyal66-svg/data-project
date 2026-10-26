@@ -23,10 +23,16 @@ df.loc[df['Prep_Time_Minutes'] < 0, 'Prep_Time_Minutes'] = (
 )
 df = df.dropna(subset=['Order_DateTime', 'Pickup_DateTime'])
 
+# 4. FIX GPS COORDINATES (strip negative sign glitches)
+df['Store_Latitude'] = df['Store_Latitude'].abs()
+df['Store_Longitude'] = df['Store_Longitude'].abs()
+df['Drop_Latitude'] = df['Drop_Latitude'].abs()
+df['Drop_Longitude'] = df['Drop_Longitude'].abs()
 
-# 4. Calculate Haversine Distance (KM)
+
+# 5. Calculate Haversine Distance (KM)
 def calculate_haversine_distance(lat1, lon1, lat2, lon2):
-  R = 6371.0  # Earth's radius in kilometers
+  R = 6371.0
   lat1_rad, lon1_rad = np.radians(lat1), np.radians(lon1)
   lat2_rad, lon2_rad = np.radians(lat2), np.radians(lon2)
 
@@ -48,6 +54,10 @@ df['Distance_KM'] = calculate_haversine_distance(
     df['Drop_Longitude'],
 )
 
-# 5. Inspect distance statistics
-print("Distance Summary (KM):")
+# 6. Filter realistic last-mile delivery distances (between 100m and 30km)
+df = df[(df['Distance_KM'] >= 0.1) & (df['Distance_KM'] <= 30)]
+
+# 7. Print the cleaned distance metrics
+print("Cleaned Dataset Shape:", df.shape)
+print("\nAccurate Delivery Distance Summary (KM):")
 print(df['Distance_KM'].describe())
